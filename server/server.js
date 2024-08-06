@@ -5,12 +5,19 @@ require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 5002;
+const corsOptions = {
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    preflightContinue: false,
+    optionsSuccessStatus: 200,
+};
 
-console.log('MongoDB URI:', process.env.MONGO_URI);
-
-
+app.use(
+    cors({
+      origin: "*",
+    })
+  );
 // Middleware
-app.use(cors());
 app.use(express.json());
 
 // MongoDB connection
@@ -18,12 +25,15 @@ mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.error('MongoDB connection error:', err));
 
-// Routes
-app.use('/api/todos', require('./routes/todoRoutes'));
+// Import routes
+const todoRoutes = require('./routes/todoRoutes');
 
-// Root route (optional)
+// Use routes
+app.use('/api/todos', todoRoutes);
+
+// Root route
 app.get('/', (req, res) => {
-    res.send('API is running');
+    res.send('Todo API is running');
 });
 
 // Start server
